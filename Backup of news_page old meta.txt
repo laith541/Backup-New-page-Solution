@@ -1,0 +1,313 @@
+import React, { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
+import axios, { Axios } from 'axios';
+import parse from "html-react-parser";
+import { Link, useNavigate } from "react-router-dom";
+import {variables} from './Variables.js';
+import { FALSE } from 'sass';
+import { useParams } from "react-router-dom";
+import MostViewed from './MostViwed.js';
+import OurLatest_News from './OurLatest_News.js';
+ 
+export default function News_Page() {
+
+
+    const [isLoading,setNisLoading] = useState(false);
+    const navigate = useNavigate();
+    const usenavigate=useNavigate();
+   
+     
+
+    //Variable Inner My News Page
+    const [newsTitle, setsnewsTitle] = useState('');
+    const [newsDate, setnewsDate] = useState();
+    const [imagePath, setimagePath] = useState('');
+    const [newsBody, setnewsBody] = useState('');
+    const [news_img_caption, setnews_img_caption] = useState('');
+    const [JsonSchema, setJsonSchema] = useState('');
+    const [providerName, setproviderName] = useState('');
+    const [providerLogo, setproviderLogo] = useState('');
+    const [org_link, setorg_link] = useState('');
+    const [newsLink, setnewsLink] = useState('');
+
+ const [tit,settit]=useState('');
+      // // // //
+
+
+    const params = new URLSearchParams(window.location.search)  
+
+    let storyID2 = params.get('StoryId1');
+    let title2 = params.get('title');
+    let social = params.get('social');
+
+    
+    let url_path = window.location.search ;
+
+    let { storyID } = useParams(); 
+    let { title } = useParams(); 
+
+   if( !params.has('storyID')  || storyID === '' ){
+    storyID2=storyID;
+ 
+    //window.location.href = "https://menafn.com/";
+ 
+   }
+   if( !params.has('title')  || title === '' ){
+    //window.location.href = "https://menafn.com/";
+     title2=title;
+   }
+
+
+   const [data,setdata]=useState('');
+   const [domain,setdomain]=useState('');
+   const [ip,setip]=useState('');
+
+     async function refda() {  
+      setNisLoading(true);
+   
+        //  To Show or Hidden Header And Footer
+        document.getElementById('English_Header').hidden = false;
+        document.getElementById('English_Footer').hidden = false;
+        //
+  
+  //
+  document.getElementById('Main_Dir').dir = "ltr";
+    
+  //
+
+
+      // In This Axios Send Dynamic (Domain,FullDomain) Parameter to Backend
+        axios.get(variables.API_URL+ '/external_site/qn_news_story_s_show_story_data_Domain' , {
+       
+          headers : {
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "*"      
+        },
+         params: {
+           storyid: storyID2,
+           title: title2,
+           lang: 'en',
+           social: social,
+           Domain:variables.domain,
+           FullDomain:variables.domain_name,
+         }   
+     })
+         .then(function (response) {
+      
+            console.log('story data');
+            console.log(response.data );
+            console.log(response.data.Item1[0].Accepted);
+            console.log(response.data.Item1[0].newsID);
+            
+              var result =    response.data.Item1[0].newsBody.replace("https://menafn.com/",variables.domain_name + "/") .replace("https://menafn.com",variables.domain_name  ) .replace("MENAFN",variables.domain) .replace("MENAFN",variables.domain)  ;  
+            
+           setsnewsTitle(response.data.Item1[0].newsTitle);
+     
+             setnewsBody(result);  
+            setnewsDate(response.data.Item1[0].newsDate.replace('T',' '));
+            setimagePath(response.data.Item1[0].imagePath.replace("https://menafn.com/",variables.domain_name + "/"))   ;
+           
+            setnews_img_caption(response.data.Item1[0].news_img_caption);
+             setproviderLogo(response.data.Item1[0].providerLogo.replace("https://menafn.com/",variables.domain_name + "/"));
+
+            
+            var result2 = response.data.Item1[0].org_link;
+            if(result2===''){
+
+            }
+            setorg_link(response.data.Item1[0].org_link);
+   
+            setnewsLink(response.data.Item1[0].newsLink );
+          
+ 
+   }).catch((err) => {
+    // This   just  for Rememmber this is Error Div Message 
+     
+   
+   });
+  // End of Axios1
+
+  // Breake
+  
+
+    }
+  
+  
+
+   
+      useEffect(() => {
+       
+       
+        setNisLoading(true);
+   
+        refda();
+           },[] )
+
+   
+const jsonUrl = variables.basename_url +'updates/index/Athlethixnet_HomeEn_Cricket.json';
+ 
+ 
+const [JsonArray, setJsonArray] = React.useState([]);
+ 
+    
+// Fetch data when the component mounts
+axios.get(jsonUrl)
+  .then(response => {
+    // Handle successful response
+    console.log(response.data); // JSON data
+    JsonArray.splice(0);   
+    for (let i in response.data) {
+       
+      JsonArray.push({
+        
+        news_title: response.data[i].news_title,
+        news_date:response.data[i].news_date,
+        news_imagename:variables.ImageStart + response.data[i].news_imagename  ,
+        link:variables.basename_url + response.data[i].link,
+        
+       Category:response.data[i].Category,
+      })
+      
+    }
+
+  })
+  .catch(error => {
+    // Handle error
+    console.error('Error fetching data:', error);
+  });
+
+ 
+           return (
+          <>
+
+<div className='backgroundcolor'> 
+       <section className="post-layout-1-area pb-80">
+        <div className="container custom-container">
+          <div className="row">
+            <div className="col-lg-12">
+              {/* <div className="about-author-content">
+                <nav aria-label="breadcrumb">
+                  <ol className="breadcrumb">
+                    <li className="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li className="breadcrumb-item"><a href="#">Worldnews</a></li>
+                    <li className="breadcrumb-item active" aria-current="page">Health</li>
+                  </ol>
+                </nav>
+              </div> */}
+            </div>
+            <div className="col-lg-8">
+              <div className="post-layout-top-content">
+            
+                <div className="post-content">
+                   <div className="thumb">
+                  
+              
+
+                  <a href={imagePath} target="_blank" > <img src={imagePath} alt="" target="_blank" /></a> 
+                  </div>
+                </div>
+                <div className="post-author">
+                  <div className="author-info">
+                    <div className="thumb">
+                      {/* <img src="assets/images/author.png" alt="" /> */}
+                    </div>
+                    {/* <h5 className="title">Subash Chandra</h5> */}
+                    <ul>
+                      {/* <li>Date:{newsDate}</li> */}
+                      {/* <li>Updated 1:58 p.m. ET</li> */}
+                    </ul>
+                  </div>
+                  <div className="author-social">
+                    <ul>
+                 
+                      <li><a href={"https://www.facebook.com/sharer/sharer.php?u=" + newsLink} ><i className="fab fa-facebook-f" /></a></li>
+                      <li> <a href={"https://twitter.com/intent/tweet?url=" + newsLink }><i className="fab fa-twitter" /></a></li>
+                       
+                      <li><a href={"https://www.whatsapp://send?text=" + newsLink }><i class="fa-brands fa-whatsapp"></i></a></li>
+                 
+                     
+                      <li><a href={"https://www.linkedin.com/shareArticle?mini=true&url=" + newsLink }>      <i class="fa-brands fa-linkedin"></i></a></li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="post-text mt-30">
+                <h1 className="title">{newsTitle}</h1>     
+                <p > {parse(newsBody)}</p>  
+   
+                  </div>
+            
+                  <div className="post-thumb">
+                      
+
+                      <h3 className="title "><a href={org_link}  target="_blank"><img src={providerLogo} alt="" target="_blank" /> </a></h3>
+                        
+                      </div>
+            
+              
+           
+             
+           
+              </div>
+    
+             
+         
+            </div>
+            <br></br>
+              <br></br>
+              <br></br>
+            
+       <div className='col-lg-4 mt-3'>
+
+       
+              <div className="post_gallery_sidebar mt-40">
+{/*ads-3  */}
+<div className="ad mt-5">
+              <a href="#"><img src="./images/ad/ad-3.png" alt="" /></a>
+            </div>
+            {/* break between ads and most viewed */}
+              <div className='mt-2'> 
+                <MostViewed/>
+                </div>
+       </div>
+       </div>
+          </div>
+        </div>
+  
+ 
+      </section>
+
+      </div>
+
+             
+<div className='backgroubdOurLatest  '>
+ 
+  
+  
+  
+   <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
+               
+                <div className='container'>
+                <div className='ml-3'>
+                <h3 className='ml-3'>Our Latest News</h3>
+                </div>
+                <div className='col-sm-12'>
+                <OurLatest_News/>
+                </div>
+                </div>
+  
+   </div>
+ 
+ 
+  
+ 
+
+ 
+ 
+{/* end back ground div */}
+         </>
+        );
+    }
